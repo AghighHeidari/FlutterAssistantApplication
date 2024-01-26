@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assistant/controller/creator_controller.dart';
 import 'package:flutter_assistant/model/build-model.dart';
+import 'package:flutter_assistant/service/pref.dart';
 import 'package:flutter_assistant/service/routing/routes.dart';
 import 'package:flutter_assistant/utils/build_status.dart';
 import 'package:flutter_assistant/utils/icons.dart';
@@ -22,6 +23,7 @@ class BuildView extends StatefulWidget {
 class _BuildViewState extends State<BuildView> {
   late Build? currentBuild;
   CreatorController creatorController = Get.find();
+  Pref pref = Get.find();
   late Timer checkTimer;
 
   @override
@@ -39,6 +41,7 @@ class _BuildViewState extends State<BuildView> {
             }
             if (currentBuild?.status == 'finished') {
               timer.cancel();
+              pref.setBuild(null);
               Get.offNamed(Routes.result, arguments: currentBuild);
             }
           });
