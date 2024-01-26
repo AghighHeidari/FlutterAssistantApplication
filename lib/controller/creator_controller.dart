@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assistant/model/build-model.dart';
 import 'package:flutter_assistant/model/create-response-model.dart';
 import 'package:flutter_assistant/model/login-response-model.dart';
 import 'package:flutter_assistant/service/api.dart';
@@ -38,25 +39,45 @@ class CreatorController extends GetxController with StateMixin<dynamic> {
   }
 
   void create({required dynamic requirements, Function()? callback}) {
-    Get.toNamed(Routes.build);
-    // api.create(requirements: requirements).then((value) {
-    //   if (callback != null) {
-    //     callback();
-    //   }
-    //   if (value is CreateResponseModel) {
-    //     pref.setBuild(value.build!);
-    //     Get.offAllNamed(Routes.build, arguments: value.build!);
-    //   }
-    // }, onError: (err) {
-    //   if (callback != null) {
-    //     callback();
-    //   }
-    //   if (err is ApiError) {
-    //     Get.showSnackbar(Utils.customSnackBar(
-    //       titleText: 'خطا',
-    //       messageText: err.message,
-    //     ));
-    //   }
-    // });
+    api.create(requirements: requirements).then((value) {
+      if (callback != null) {
+        callback();
+      }
+      if (value is CreateResponseModel) {
+        pref.setBuild(value.build!);
+        Get.toNamed(Routes.build, arguments: value.build!);
+      }
+    }, onError: (err) {
+      if (callback != null) {
+        callback();
+      }
+      if (err is ApiError) {
+        Get.showSnackbar(Utils.customSnackBar(
+          titleText: 'خطا',
+          messageText: err.message,
+        ));
+      }
+    });
+  }
+
+  void checkBuild({required int buildId, Function(Build? build)? callback}) {
+    api.checkBuild(buildId: buildId).then((value) {
+      if (value is CreateResponseModel) {
+        pref.setBuild(value.build!);
+        if (callback != null) {
+          callback(value.build);
+        }
+      }
+    }, onError: (err) {
+      if (callback != null) {
+        callback(null);
+      }
+      if (err is ApiError) {
+        Get.showSnackbar(Utils.customSnackBar(
+          titleText: 'خطا',
+          messageText: err.message,
+        ));
+      }
+    });
   }
 }

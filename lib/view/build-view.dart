@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_assistant/controller/creator_controller.dart';
 import 'package:flutter_assistant/model/build-model.dart';
 import 'package:flutter_assistant/service/routing/routes.dart';
+import 'package:flutter_assistant/utils/build_status.dart';
 import 'package:flutter_assistant/utils/icons.dart';
 import 'package:flutter_assistant/utils/textEx.dart';
 import 'package:get/get.dart';
@@ -18,26 +21,46 @@ class BuildView extends StatefulWidget {
 
 class _BuildViewState extends State<BuildView> {
   late Build? currentBuild;
+  CreatorController creatorController = Get.find();
+  late Timer checkTimer;
 
   @override
   void initState() {
     currentBuild = Get.arguments;
-    currentBuild ??= Build(id: 0, status: 'در حال ساخت ...', url: 'https://test.aghighheidari.ir');
-    Future.delayed(const Duration(seconds: 5), () {
-      Get.offNamed(Routes.result);
+    currentBuild ??= Build(id: 0, status: 'started', url: 'https://test.aghighheidari.ir');
+    checkTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      creatorController.checkBuild(
+          buildId: currentBuild!.id!,
+          callback: (Build? newBuild) {
+            if (newBuild != null) {
+              setState(() {
+                currentBuild = newBuild;
+              });
+            }
+            if (currentBuild?.status == 'finished') {
+              timer.cancel();
+              Get.offNamed(Routes.result, arguments: currentBuild);
+            }
+          });
     });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        height: Get.height,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [_loadingBoxContainer()],
+    return WillPopScope(
+      onWillPop: () async{
+        checkTimer.cancel();
+        return true;
+      },
+      child: SingleChildScrollView(
+        child: Container(
+          height: Get.height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [_loadingBoxContainer()],
+          ),
         ),
       ),
     );
@@ -59,18 +82,20 @@ class _BuildViewState extends State<BuildView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      ' وضعیت:   ${currentBuild?.status ?? ''}',
+                      ' وضعیت:   ${(currentBuild?.status ?? '').convertStatus}',
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
                     ),
-                    SizedBox(height: 20,),
-                    const SizedBox(
-                      height: 40,
-                      width: 40,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
+                    const SizedBox(height: 20,),
+                    (currentBuild?.status ?? "") != 'error'
+                        ? const SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Container()
                   ],
                 ),
               ),

@@ -50,7 +50,9 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     if (Pref().getBuild() != null) {
-      Get.offAllNamed(Routes.build, arguments: Pref().getBuild()!);
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        Get.toNamed(Routes.build, arguments: Pref().getBuild()!);
+      });
     }
     titleController = TextEditingController(text: '');
     productTypeController = TextEditingController(text: '');
@@ -375,7 +377,7 @@ class _HomeViewState extends State<HomeView> {
                             }
                             setState(() {
                               products.add({
-                                'title': productTitleController.text,
+                                'name': productTitleController.text,
                                 'price': productPriceController.text,
                               });
                               productTitleController.clear();
@@ -414,7 +416,7 @@ class _HomeViewState extends State<HomeView> {
                                     SizedBox(
                                       width: 230,
                                       child: Text(
-                                        '${e['title']}\n${e['price']}',
+                                        '${e['name']}\n${e['price']}',
                                         style: const TextStyle(color: Colors.white, fontSize: 18),
                                       ),
                                     ),
@@ -508,7 +510,18 @@ class _HomeViewState extends State<HomeView> {
           return;
         }
         creatorController.create(
-            requirements: {},
+            requirements: {
+              'title': titleController.text,
+              'itemType': productTypeController.text,
+              'menuItems': menuItems,
+              'colors': [primaryColor.hex, secondaryColor.hex, tertiaryColor.hex],
+              'products': products,
+              'shopType': shopType,
+              'phoneNumber': phoneNumberController.text,
+              'email': emailController.text,
+              'instagram': instagramController.text,
+              'telegram': telegramController.text
+            },
             callback: () {
               context.loaderOverlay.hide();
               loading.value = false;

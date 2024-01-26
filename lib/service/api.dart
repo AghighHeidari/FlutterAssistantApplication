@@ -45,6 +45,10 @@ class Api extends GetConnect {
     return responseParser(await post('/openai/create', body, headers: {'language': 'fa'}), (map) => CreateResponseModel.fromJson(map), showLog: true);
   }
 
+  Future<dynamic> checkBuild({required int buildId}) async {
+    return responseParser(await get('/openai/check-build/$buildId', headers: {'language': 'fa'}), (map) => CreateResponseModel.fromJson(map), showLog: true);
+  }
+
   Future<dynamic> responseParser(
     Response response,
     Function(dynamic map) decode, {

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assistant/model/build-model.dart';
+import 'package:flutter_assistant/utils/build_status.dart';
 import 'package:flutter_assistant/utils/icons.dart';
 import 'package:flutter_assistant/utils/textEx.dart';
 import 'package:get/get.dart';
@@ -28,7 +29,7 @@ class _ResultViewState extends State<ResultView> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Container(
+      child: SizedBox(
         height: Get.height,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -55,7 +56,7 @@ class _ResultViewState extends State<ResultView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      ' وضعیت:   ${currentBuild?.status ?? ''}',
+                      ' وضعیت:   ${(currentBuild?.status ?? '').convertStatus}',
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
                     ),
                     TextButton(

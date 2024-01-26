@@ -22,6 +22,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      Future.delayed(const Duration(seconds: 2));
       if (pref.isLoggedIn()) {
         Get.toNamed(Routes.home);
       } else {
